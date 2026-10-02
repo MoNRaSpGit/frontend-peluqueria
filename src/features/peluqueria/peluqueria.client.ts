@@ -12,8 +12,10 @@ async function readJson<T>(response: Response): Promise<T> {
   return text ? (JSON.parse(text) as T) : (undefined as T);
 }
 
-export async function fetchBusySlots(from: string, to: string): Promise<PeluqueriaBusySlot[]> {
-  const response = await fetch(buildUrl(`/peluqueria/busy-slots?from=${from}&to=${to}`));
+export async function fetchBusySlots(peluquero: string, from: string, to: string): Promise<PeluqueriaBusySlot[]> {
+  const response = await fetch(
+    buildUrl(`/peluqueria/busy-slots?peluquero=${encodeURIComponent(peluquero)}&from=${from}&to=${to}`)
+  );
   if (!response.ok) throw new Error("No se pudieron cargar los horarios ocupados.");
   return readJson<PeluqueriaBusySlot[]>(response);
 }
@@ -25,6 +27,7 @@ export async function fetchReservations(): Promise<PeluqueriaReservation[]> {
 }
 
 export async function createReservation(input: {
+  peluquero: string;
   date: string;
   time: string;
   clientName: string;

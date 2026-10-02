@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookingModal } from "./components/BookingModal";
+import { PeluqueroPicker } from "./components/PeluqueroPicker";
 import { createReservation, fetchBusySlots, PeluqueriaSlotTakenError } from "./peluqueria.client";
 import { buildDaySlots, buildUpcomingSalonDays, isSlotInThePast } from "./peluqueria.shared";
 
 export function PeluqueriaHomePage() {
+  // Paso 1: elegir peluquero (null = todavia no eligio, se muestra el
+  // picker). Paso 2: calendario de ESE peluquero. Paso 3 (BookingModal):
+  // completar nombre y celular -- eso ya estaba.
+  const [selectedPeluquero, setSelectedPeluquero] = useState<string | null>(null);
+
   const salonDays = useMemo(() => buildUpcomingSalonDays(), []);
   const daySlots = useMemo(() => buildDaySlots(), []);
   const [selectedDateKey, setSelectedDateKey] = useState(salonDays[0]?.dateKey ?? "");
@@ -20,13 +26,13 @@ export function PeluqueriaHomePage() {
   const lastDateKey = salonDays[salonDays.length - 1]?.dateKey;
 
   useEffect(() => {
-    if (!firstDateKey || !lastDateKey) return;
+    if (!selectedPeluquero || !firstDateKey || !lastDateKey) return;
     let cancelled = false;
 
     setIsLoading(true);
     setLoadError(null);
 
-    fetchBusySlots(firstDateKey, lastDateKey)
+    fetchBusySlots(selectedPeluquero, firstDateKey, lastDateKey)
       .then((slots) => {
         if (cancelled) return;
         setBusySlots(new Set(slots.map((slot) => `${slot.date} ${slot.time}`)));
@@ -41,9 +47,9 @@ export function PeluqueriaHomePage() {
     return () => {
       cancelled = true;
     };
-    // Se vuelve a cargar cada vez que se confirma una reserva (ver
-    // handleConfirmBooking), via el cambio de confirmedMessage.
-  }, [firstDateKey, lastDateKey, confirmedMessage]);
+    // Se vuelve a cargar al elegir peluquero y cada vez que se confirma
+    // una reserva (ver handleConfirmBooking), via confirmedMessage.
+  }, [selectedPeluquero, firstDateKey, lastDateKey, confirmedMessage]);
 
   const selectedDay = salonDays.find((day) => day.dateKey === selectedDateKey);
 
@@ -54,13 +60,21 @@ export function PeluqueriaHomePage() {
   }
 
   async function handleConfirmBooking(clientName: string, clientPhone: string) {
-    if (!selectedDay || !bookingSlot) return;
+    if (!selectedPeluquero || !selectedDay || !bookingSlot) return;
     setIsSubmitting(true);
     setBookingError(null);
 
     try {
-      await createReservation({ date: selectedDay.dateKey, time: bookingSlot, clientName, clientPhone });
-      setConfirmedMessage(`Listo, ${clientName}! Tu turno quedo reservado para el ${selectedDay.dayNumber} de ${selectedDay.monthLabel} a las ${bookingSlot}.`);
+      await createReservation({
+        peluquero: selectedPeluquero,
+        date: selectedDay.dateKey,
+        time: bookingSlot,
+        clientName,
+        clientPhone
+      });
+      setConfirmedMessage(
+        `Listo, ${clientName}! Tu turno con ${selectedPeluquero} quedo reservado para el ${selectedDay.dayNumber} de ${selectedDay.monthLabel} a las ${bookingSlot}.`
+      );
       setBookingSlot(null);
     } catch (error) {
       if (error instanceof PeluqueriaSlotTakenError) {
@@ -73,10 +87,18 @@ export function PeluqueriaHomePage() {
     }
   }
 
+  if (!selectedPeluquero) {
+    return <PeluqueroPicker onSelect={setSelectedPeluquero} />;
+  }
+
   return (
     <div className="peluqueria-page">
+      <button type="button" className="back-link" onClick={() => setSelectedPeluquero(null)}>
+        ‹ Cambiar peluquero
+      </button>
+
       <header className="peluqueria-header">
-        <h1>Reservar turno</h1>
+        <h1>Turno con {selectedPeluquero}</h1>
         <p>Elegi un dia y un horario libre.</p>
       </header>
 

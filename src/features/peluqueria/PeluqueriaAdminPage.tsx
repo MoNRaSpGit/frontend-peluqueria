@@ -56,6 +56,7 @@ function ReservationTable({ reservations, emptyText }: { reservations: Peluqueri
     <table className="admin-table">
       <thead>
         <tr>
+          <th>Peluquero</th>
           <th>Fecha</th>
           <th>Hora</th>
           <th>Nombre</th>
@@ -65,6 +66,7 @@ function ReservationTable({ reservations, emptyText }: { reservations: Peluqueri
       <tbody>
         {reservations.map((reservation) => (
           <tr key={reservation.id}>
+            <td>{reservation.peluquero}</td>
             <td>{reservation.date}</td>
             <td>{reservation.time}</td>
             <td>{reservation.clientName}</td>
