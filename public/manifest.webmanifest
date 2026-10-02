@@ -1,0 +1,15 @@
+{
+  "name": "Reservas Peluqueria",
+  "short_name": "Peluqueria",
+  "description": "Reserva de turnos online, sin login.",
+  "lang": "es-UY",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf6f2",
+  "theme_color": "#b5693f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
