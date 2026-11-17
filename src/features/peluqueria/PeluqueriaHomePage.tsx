@@ -38,7 +38,7 @@ export function PeluqueriaHomePage() {
         setBusySlots(new Set(slots.map((slot) => `${slot.date} ${slot.time}`)));
       })
       .catch(() => {
-        if (!cancelled) setLoadError("No se pudieron cargar los horarios. Recarga la pagina.");
+        if (!cancelled) setLoadError("No se pudieron cargar los horarios. Recargá la página.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -73,14 +73,14 @@ export function PeluqueriaHomePage() {
         clientPhone
       });
       setConfirmedMessage(
-        `Listo, ${clientName}! Tu turno con ${selectedPeluquero} quedo reservado para el ${selectedDay.dayNumber} de ${selectedDay.monthLabel} a las ${bookingSlot}.`
+        `🎉 ¡Listo, ${clientName}! Tu turno con ${selectedPeluquero} quedó para el ${selectedDay.dayNumber} de ${selectedDay.monthLabel} a las ${bookingSlot}. ¡Te esperamos!`
       );
       setBookingSlot(null);
     } catch (error) {
       if (error instanceof PeluqueriaSlotTakenError) {
         setBookingError(error.message);
       } else {
-        setBookingError("No se pudo guardar la reserva. Proba de nuevo.");
+        setBookingError("No se pudo guardar la reserva. Probá de nuevo.");
       }
     } finally {
       setIsSubmitting(false);
@@ -94,12 +94,14 @@ export function PeluqueriaHomePage() {
   return (
     <div className="peluqueria-page">
       <button type="button" className="back-link" onClick={() => setSelectedPeluquero(null)}>
-        ‹ Cambiar peluquero
+        ← Cambiar peluquero
       </button>
 
       <header className="peluqueria-header">
-        <h1>Turno con {selectedPeluquero}</h1>
-        <p>Elegi un dia y un horario libre.</p>
+        <h1>
+          Turno con <span className="grad">{selectedPeluquero}</span>
+        </h1>
+        <p>Elegí el día y tocá un horario libre.</p>
       </header>
 
       {confirmedMessage ? <p className="confirmed-banner">{confirmedMessage}</p> : null}
@@ -120,10 +122,14 @@ export function PeluqueriaHomePage() {
       </div>
 
       {isLoading ? (
-        <p className="status-text">Cargando horarios...</p>
+        <p className="status-text">Cargando horarios… ⏳</p>
       ) : loadError ? (
         <p className="status-text status-error">{loadError}</p>
       ) : (
+        <>
+        <p className="slots-title">
+          Horarios del {selectedDay?.weekdayLabel.toLowerCase()} {selectedDay?.dayNumber}
+        </p>
         <div className="slots-grid">
           {daySlots.map((time) => {
             const isPast = selectedDay ? isSlotInThePast(selectedDay.dateKey, time) : false;
@@ -144,6 +150,7 @@ export function PeluqueriaHomePage() {
             );
           })}
         </div>
+        </>
       )}
 
       {bookingSlot && selectedDay ? (
