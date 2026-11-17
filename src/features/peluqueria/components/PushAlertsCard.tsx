@@ -26,7 +26,7 @@ export function PushAlertsCard() {
         setMessage("¡Listo! Mandamos una notificación de prueba.");
         await sendTestPush();
       } else if (result === "denied") {
-        setMessage("Bloqueaste los permisos. Activalos desde los ajustes del navegador para este sitio.");
+        setMessage("El navegador tiene bloqueadas las notificaciones de este sitio. Para permitirlas: tocá el ícono a la izquierda de la dirección → Permisos → Notificaciones → Permitir. Después recargá la página y tocá Activar avisos de nuevo.");
       } else if (result === "unavailable") {
         setMessage("Los avisos todavía no están disponibles en el servidor.");
       } else {
