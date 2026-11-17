@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PeluqueriaAdminPage } from "./PeluqueriaAdminPage";
 import { PeluqueriaHomePage } from "./PeluqueriaHomePage";
+import { SalonHeader } from "./components/SalonHeader";
 
 // Ruteo por hash en vez de rutas de verdad (ej. react-router): GitHub
 // Pages no sabe servir /admin directo (404 al refrescar), pero #admin
@@ -20,5 +21,11 @@ export function PeluqueriaApp() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  return route === "admin" ? <PeluqueriaAdminPage /> : <PeluqueriaHomePage />;
+  if (route === "admin") return <PeluqueriaAdminPage />;
+  return (
+    <>
+      <SalonHeader />
+      <PeluqueriaHomePage />
+    </>
+  );
 }

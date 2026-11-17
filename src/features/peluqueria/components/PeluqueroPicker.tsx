@@ -12,7 +12,6 @@ export function PeluqueroPicker({ onSelect }: PeluqueroPickerProps) {
   return (
     <div className="peluqueria-page">
       <header className="peluqueria-header">
-        <span className="brand-pill">✂️ Reservá tu turno</span>
         <h1>
           ¿Con quién <span className="grad">te cortás</span> hoy?
         </h1>
