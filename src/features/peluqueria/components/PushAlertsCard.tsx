@@ -8,6 +8,7 @@ export function PushAlertsCard() {
   const [active, setActive] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [permission, setPermission] = useState<string>(isPushSupported() ? Notification.permission : "no disponible");
 
   useEffect(() => {
     if (!supported) return;
@@ -35,6 +36,7 @@ export function PushAlertsCard() {
     } catch {
       setMessage("No se pudieron activar los avisos. Probá de nuevo.");
     } finally {
+      if (isPushSupported()) setPermission(Notification.permission);
       setBusy(false);
     }
   }
@@ -69,6 +71,9 @@ export function PushAlertsCard() {
               : "Activalos y te llega una notificación cada vez que alguien reserva un turno."}
         </p>
         {message ? <p className="push-card-message">{message}</p> : null}
+        <p className="push-card-text">
+          Permiso del navegador: {permission === "granted" ? "permitido" : permission === "denied" ? "bloqueado" : permission === "default" ? "sin elegir (te va a preguntar)" : permission}
+        </p>
       </div>
       {supported ? (
         <div className="push-card-actions">
