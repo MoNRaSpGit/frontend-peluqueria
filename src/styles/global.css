@@ -523,3 +523,119 @@ button {
   display: flex;
   gap: 10px;
 }
+
+/* Avisos dentro de la app: campanita con circulito rojo (17/11/2026) */
+.admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bell {
+  position: relative;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bell-icon {
+  font-size: 22px;
+}
+
+.bell-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ff3d5a;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 3px var(--color-bg);
+  animation: pop 0.35s ease;
+}
+
+.fresh-card {
+  margin-bottom: 18px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 61, 90, 0.5);
+  background: linear-gradient(135deg, rgba(255, 61, 90, 0.12), rgba(139, 92, 246, 0.12));
+}
+
+.fresh-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.fresh-card-button {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fresh-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.fresh-list li {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  font-size: 14px;
+}
+
+.fresh-time {
+  color: var(--color-lime);
+  font-weight: 700;
+}
+
+.fresh-phone {
+  color: var(--color-muted);
+}
+
+.fresh-empty {
+  margin: 0 0 18px;
+}
+
+.row-fresh td {
+  background: rgba(255, 61, 90, 0.1);
+}
+
+.new-pill {
+  margin-left: 8px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #ff3d5a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
