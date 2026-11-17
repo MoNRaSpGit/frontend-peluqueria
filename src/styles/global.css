@@ -489,41 +489,6 @@ button {
   padding-top: 22px;
 }
 
-/* Tarjeta de avisos push del panel del dueño (17/11/2026) */
-.push-card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 18px;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-}
-
-.push-card-title {
-  margin: 0 0 6px;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.push-card-text,
-.push-card-message {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 14px;
-}
-
-.push-card-message {
-  margin-top: 8px;
-  color: var(--color-lime);
-}
-
-.push-card-actions {
-  display: flex;
-  gap: 10px;
-}
-
 /* Avisos dentro de la app: campanita con circulito rojo (17/11/2026) */
 .admin-header {
   display: flex;

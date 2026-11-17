@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { PushAlertsCard } from "./components/PushAlertsCard";
 import { fetchReservations } from "./peluqueria.client";
 import type { PeluqueriaReservation } from "./peluqueria.types";
 
@@ -26,26 +25,20 @@ function saveLastSeen(id: number) {
   }
 }
 
-// Numerito en el icono de la app instalada (solo donde el navegador lo permite).
-function updateAppBadge(count: number) {
-  const nav = navigator as Navigator & { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> };
-  try {
-    if (count > 0) void nav.setAppBadge?.(count);
-    else void nav.clearAppBadge?.();
-  } catch {
-    // no soportado
-  }
-}
-
 export function PeluqueriaAdminPage() {
   const [reservations, setReservations] = useState<PeluqueriaReservation[] | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [lastSeenId, setLastSeenId] = useState(readLastSeen);
+  // Lo "nuevo" se calcula contra lo ultimo que vio ANTES de entrar a esta visita:
+  // durante la visita sigue resaltado, y apenas carga se guarda como visto, asi
+  // la proxima vez que entre ya no aparece.
+  const [lastSeenId] = useState(readLastSeen);
 
   const load = useCallback(() => {
     fetchReservations()
       .then((items) => {
         setReservations(items);
+        const maxId = items.reduce((max, item) => Math.max(max, item.id), 0);
+        if (maxId > readLastSeen()) saveLastSeen(maxId);
         setErrorMessage(null);
       })
       .catch(() => setErrorMessage("No se pudieron cargar las reservas."));
@@ -59,16 +52,6 @@ export function PeluqueriaAdminPage() {
 
   const fresh = (reservations ?? []).filter((reservation) => reservation.id > lastSeenId);
   const freshIds = new Set(fresh.map((reservation) => reservation.id));
-
-  useEffect(() => {
-    updateAppBadge(fresh.length);
-  }, [fresh.length]);
-
-  function markAllSeen() {
-    const maxId = Math.max(lastSeenId, ...(reservations ?? []).map((reservation) => reservation.id));
-    saveLastSeen(maxId);
-    setLastSeenId(maxId);
-  }
 
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -96,9 +79,6 @@ export function PeluqueriaAdminPage() {
             <strong>
               {fresh.length === 1 ? "1 reserva nueva" : `${fresh.length} reservas nuevas`}
             </strong>
-            <button type="button" className="fresh-card-button" onClick={markAllSeen}>
-              Marcar como vistas
-            </button>
           </div>
           <ul className="fresh-list">
             {fresh.map((reservation) => (
@@ -117,8 +97,6 @@ export function PeluqueriaAdminPage() {
       ) : reservations ? (
         <p className="status-text fresh-empty">✔ Estás al día, no hay reservas nuevas.</p>
       ) : null}
-
-      <PushAlertsCard />
 
       {errorMessage ? <p className="status-text status-error">{errorMessage}</p> : null}
       {!reservations && !errorMessage ? <p className="status-text">Cargando...</p> : null}
