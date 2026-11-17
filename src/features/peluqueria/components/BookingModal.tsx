@@ -1,15 +1,20 @@
 import { useState, type FormEvent } from "react";
+import { clearRememberedClient, loadRememberedClient } from "../peluqueria.session";
 
 type BookingModalProps = {
   dateLabel: string;
   time: string;
+  barberName: string;
   isSubmitting: boolean;
   errorMessage: string | null;
   onCancel: () => void;
   onConfirm: (clientName: string, clientPhone: string) => void;
 };
 
-export function BookingModal({ dateLabel, time, isSubmitting, errorMessage, onCancel, onConfirm }: BookingModalProps) {
+export function BookingModal({ dateLabel, time, barberName, isSubmitting, errorMessage, onCancel, onConfirm }: BookingModalProps) {
+  // Si este celular ya reservo antes, se le pregunta "¿sos vos?" en vez de
+  // pedirle todo de nuevo. "No soy yo" borra lo recordado y muestra el formulario.
+  const [remembered, setRemembered] = useState(loadRememberedClient);
   const [clientName, setClientName] = useState("");
   const [clientPhone, setClientPhone] = useState("");
 
@@ -19,49 +24,79 @@ export function BookingModal({ dateLabel, time, isSubmitting, errorMessage, onCa
     onConfirm(clientName.trim(), clientPhone.trim());
   }
 
+  function handleNotMe() {
+    clearRememberedClient();
+    setRemembered(null);
+  }
+
   return (
     <div className="modal-backdrop" role="presentation">
       <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
-        <h2 id="booking-modal-title">Reservá tu turno</h2>
+        <h2 id="booking-modal-title">{remembered ? `¿Sos ${remembered.name}?` : "Reservá tu turno"}</h2>
         <p className="modal-slot-summary">
-          {dateLabel} a las <strong>{time}</strong>
+          {dateLabel} a las <strong>{time}</strong> con {barberName}
         </p>
 
-        <form onSubmit={handleSubmit}>
-          <label className="modal-field">
-            <span>Nombre</span>
-            <input
-              type="text"
-              value={clientName}
-              onChange={(event) => setClientName(event.target.value)}
-              placeholder="¿Cómo te llamás?"
-              autoFocus
-              disabled={isSubmitting}
-            />
-          </label>
+        {remembered ? (
+          <>
+            <p className="remembered-card">
+              <strong>{remembered.name}</strong>
+              <span>{remembered.phone}</span>
+            </p>
 
-          <label className="modal-field">
-            <span>Celular</span>
-            <input
-              type="tel"
-              value={clientPhone}
-              onChange={(event) => setClientPhone(event.target.value)}
-              placeholder="099123456"
-              disabled={isSubmitting}
-            />
-          </label>
+            {errorMessage ? <p className="modal-error">{errorMessage}</p> : null}
 
-          {errorMessage ? <p className="modal-error">{errorMessage}</p> : null}
-
-          <div className="modal-actions">
-            <button type="button" className="ghost-button" onClick={onCancel} disabled={isSubmitting}>
-              Cancelar
+            <div className="modal-actions">
+              <button type="button" className="ghost-button" onClick={onCancel} disabled={isSubmitting}>
+                Cancelar
+              </button>
+              <button type="button" className="primary-button" disabled={isSubmitting} onClick={() => onConfirm(remembered.name, remembered.phone)}>
+                {isSubmitting ? "Reservando…" : "Sí, soy yo"}
+              </button>
+            </div>
+            <button type="button" className="not-me-link" onClick={handleNotMe} disabled={isSubmitting}>
+              No soy {remembered.name}
             </button>
-            <button type="submit" className="primary-button" disabled={isSubmitting || !clientName.trim() || !clientPhone.trim()}>
-              {isSubmitting ? "Reservando…" : "Confirmar"}
-            </button>
-          </div>
-        </form>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <label className="modal-field">
+              <span>Nombre</span>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(event) => setClientName(event.target.value)}
+                placeholder="¿Cómo te llamás?"
+                autoFocus
+                disabled={isSubmitting}
+              />
+            </label>
+
+            <label className="modal-field">
+              <span>Celular</span>
+              <input
+                type="tel"
+                value={clientPhone}
+                onChange={(event) => setClientPhone(event.target.value)}
+                placeholder="099123456"
+                disabled={isSubmitting}
+              />
+            </label>
+
+            <p className="remember-hint">Guardamos tus datos en este celular para que la próxima reserva sea más rápida.</p>
+
+            {errorMessage ? <p className="modal-error">{errorMessage}</p> : null}
+
+            <div className="modal-actions">
+              <button type="button" className="ghost-button" onClick={onCancel} disabled={isSubmitting}>
+                Cancelar
+              </button>
+              <button type="submit" className="primary-button" disabled={isSubmitting || !clientName.trim() || !clientPhone.trim()}>
+                {isSubmitting ? "Reservando…" : "Confirmar"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

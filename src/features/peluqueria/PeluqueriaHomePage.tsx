@@ -2,16 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { BookingModal } from "./components/BookingModal";
 import { PeluqueroPicker } from "./components/PeluqueroPicker";
 import { createReservation, fetchBusySlots, PeluqueriaSlotTakenError } from "./peluqueria.client";
-import { buildDaySlots, buildUpcomingSalonDays, isSlotInThePast } from "./peluqueria.shared";
+import { saveRememberedClient } from "./peluqueria.session";
+import { buildSlotsForWeekday, buildUpcomingSalonDays, isSlotInThePast } from "./peluqueria.shared";
+import type { PeluqueriaBarber, PeluqueriaSalon } from "./peluqueria.types";
 
-export function PeluqueriaHomePage() {
+export function PeluqueriaHomePage({ salon }: { salon: PeluqueriaSalon }) {
   // Paso 1: elegir peluquero (null = todavia no eligio, se muestra el
   // picker). Paso 2: calendario de ESE peluquero. Paso 3 (BookingModal):
-  // completar nombre y celular -- eso ya estaba.
-  const [selectedPeluquero, setSelectedPeluquero] = useState<string | null>(null);
+  // confirmar nombre y celular (si el celular ya la conoce, solo pregunta
+  // "¿sos vos?").
+  const [selectedBarber, setSelectedBarber] = useState<PeluqueriaBarber | null>(null);
 
-  const salonDays = useMemo(() => buildUpcomingSalonDays(), []);
-  const daySlots = useMemo(() => buildDaySlots(), []);
+  const salonDays = useMemo(() => buildUpcomingSalonDays(salon.schedule), [salon.schedule]);
   const [selectedDateKey, setSelectedDateKey] = useState(salonDays[0]?.dateKey ?? "");
   const [busySlots, setBusySlots] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -26,13 +28,13 @@ export function PeluqueriaHomePage() {
   const lastDateKey = salonDays[salonDays.length - 1]?.dateKey;
 
   useEffect(() => {
-    if (!selectedPeluquero || !firstDateKey || !lastDateKey) return;
+    if (!selectedBarber || !firstDateKey || !lastDateKey) return;
     let cancelled = false;
 
     setIsLoading(true);
     setLoadError(null);
 
-    fetchBusySlots(selectedPeluquero, firstDateKey, lastDateKey)
+    fetchBusySlots(salon.slug, selectedBarber.id, firstDateKey, lastDateKey)
       .then((slots) => {
         if (cancelled) return;
         setBusySlots(new Set(slots.map((slot) => `${slot.date} ${slot.time}`)));
@@ -49,9 +51,10 @@ export function PeluqueriaHomePage() {
     };
     // Se vuelve a cargar al elegir peluquero y cada vez que se confirma
     // una reserva (ver handleConfirmBooking), via confirmedMessage.
-  }, [selectedPeluquero, firstDateKey, lastDateKey, confirmedMessage]);
+  }, [salon.slug, selectedBarber, firstDateKey, lastDateKey, confirmedMessage]);
 
   const selectedDay = salonDays.find((day) => day.dateKey === selectedDateKey);
+  const daySlots = useMemo(() => (selectedDay ? buildSlotsForWeekday(salon.schedule, selectedDay.weekday) : []), [salon.schedule, selectedDay]);
 
   function handleOpenBooking(time: string) {
     setBookingError(null);
@@ -60,51 +63,51 @@ export function PeluqueriaHomePage() {
   }
 
   async function handleConfirmBooking(clientName: string, clientPhone: string) {
-    if (!selectedPeluquero || !selectedDay || !bookingSlot) return;
+    if (!selectedBarber || !selectedDay || !bookingSlot) return;
     setIsSubmitting(true);
     setBookingError(null);
 
     try {
-      await createReservation({
-        peluquero: selectedPeluquero,
+      await createReservation(salon.slug, {
+        barberId: selectedBarber.id,
         date: selectedDay.dateKey,
         time: bookingSlot,
         clientName,
         clientPhone
       });
+      // El celular se acuerda de ella/el para la proxima vez.
+      saveRememberedClient({ name: clientName, phone: clientPhone });
       setConfirmedMessage(
-        `🎉 ¡Listo, ${clientName}! Tu turno con ${selectedPeluquero} quedó para el ${selectedDay.dayNumber} de ${selectedDay.monthLabel} a las ${bookingSlot}. ¡Te esperamos!`
+        `🎉 ¡Listo, ${clientName}! Tu turno con ${selectedBarber.name} quedó para el ${selectedDay.dayNumber} de ${selectedDay.monthLabel} a las ${bookingSlot}. ¡Te esperamos!`
       );
       setBookingSlot(null);
     } catch (error) {
-      if (error instanceof PeluqueriaSlotTakenError) {
-        setBookingError(error.message);
-      } else {
-        setBookingError("No se pudo guardar la reserva. Probá de nuevo.");
-      }
+      setBookingError(error instanceof PeluqueriaSlotTakenError || error instanceof Error ? error.message : "No se pudo guardar la reserva. Probá de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  if (!selectedPeluquero) {
-    return <PeluqueroPicker onSelect={setSelectedPeluquero} />;
+  if (!selectedBarber) {
+    return <PeluqueroPicker barbers={salon.barbers} onSelect={setSelectedBarber} />;
   }
 
   return (
     <div className="peluqueria-page">
-      <button type="button" className="back-link" onClick={() => setSelectedPeluquero(null)}>
+      <button type="button" className="back-link" onClick={() => setSelectedBarber(null)}>
         ← Cambiar peluquero
       </button>
 
       <header className="peluqueria-header">
         <h1>
-          Turno con <span className="grad">{selectedPeluquero}</span>
+          Turno con <span className="grad">{selectedBarber.name}</span>
         </h1>
         <p>Elegí el día y tocá un horario libre.</p>
       </header>
 
       {confirmedMessage ? <p className="confirmed-banner">{confirmedMessage}</p> : null}
+
+      {salonDays.length === 0 ? <p className="status-text">Esta peluquería todavía no cargó sus horarios.</p> : null}
 
       <div className="day-picker">
         {salonDays.map((day) => (
@@ -127,29 +130,29 @@ export function PeluqueriaHomePage() {
         <p className="status-text status-error">{loadError}</p>
       ) : (
         <>
-        <p className="slots-title">
-          Horarios del {selectedDay?.weekdayLabel.toLowerCase()} {selectedDay?.dayNumber}
-        </p>
-        <div className="slots-grid">
-          {daySlots.map((time) => {
-            const isPast = selectedDay ? isSlotInThePast(selectedDay.dateKey, time) : false;
-            const isBusy = selectedDay ? busySlots.has(`${selectedDay.dateKey} ${time}`) : false;
-            const isDisabled = isPast || isBusy;
+          <p className="slots-title">
+            Horarios del {selectedDay?.weekdayLabel.toLowerCase()} {selectedDay?.dayNumber}
+          </p>
+          <div className="slots-grid">
+            {daySlots.map((time) => {
+              const isPast = selectedDay ? isSlotInThePast(selectedDay.dateKey, time) : false;
+              const isBusy = selectedDay ? busySlots.has(`${selectedDay.dateKey} ${time}`) : false;
+              const isDisabled = isPast || isBusy;
 
-            return (
-              <button
-                key={time}
-                type="button"
-                className={isDisabled ? "slot-button slot-button-disabled" : "slot-button"}
-                disabled={isDisabled}
-                onClick={() => handleOpenBooking(time)}
-              >
-                {time}
-                {isBusy && !isPast ? <span className="slot-busy-label">Ocupado</span> : null}
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={time}
+                  type="button"
+                  className={isDisabled ? "slot-button slot-button-disabled" : "slot-button"}
+                  disabled={isDisabled}
+                  onClick={() => handleOpenBooking(time)}
+                >
+                  {time}
+                  {isBusy && !isPast ? <span className="slot-busy-label">Ocupado</span> : null}
+                </button>
+              );
+            })}
+          </div>
         </>
       )}
 
@@ -157,6 +160,7 @@ export function PeluqueriaHomePage() {
         <BookingModal
           dateLabel={`${selectedDay.weekdayLabel} ${selectedDay.dayNumber} de ${selectedDay.monthLabel}`}
           time={bookingSlot}
+          barberName={selectedBarber.name}
           isSubmitting={isSubmitting}
           errorMessage={bookingError}
           onCancel={() => setBookingSlot(null)}

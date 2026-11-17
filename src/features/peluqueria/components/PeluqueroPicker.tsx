@@ -1,14 +1,13 @@
-import { PELUQUEROS } from "../peluqueria.types";
+import type { PeluqueriaBarber } from "../peluqueria.types";
 
 type PeluqueroPickerProps = {
-  onSelect: (peluquero: string) => void;
+  barbers: PeluqueriaBarber[];
+  onSelect: (barber: PeluqueriaBarber) => void;
 };
 
-// Paso 1 del flujo (02/10/2026, pedido explicito: "primero seleccionamos
-// el peluquero... despues va al turno de ese peluquero"). Lista fija por
-// ahora -- cada uno tiene su propia agenda independiente, ver
-// peluqueria.client.ts#fetchBusySlots.
-export function PeluqueroPicker({ onSelect }: PeluqueroPickerProps) {
+// Paso 1 del flujo: elegir peluquero. Cada uno tiene su propia agenda
+// independiente (ver peluqueria.client.ts#fetchBusySlots).
+export function PeluqueroPicker({ barbers, onSelect }: PeluqueroPickerProps) {
   return (
     <div className="peluqueria-page">
       <header className="peluqueria-header">
@@ -18,11 +17,13 @@ export function PeluqueroPicker({ onSelect }: PeluqueroPickerProps) {
         <p>Elegí tu peluquero y mirá los horarios libres.</p>
       </header>
 
+      {barbers.length === 0 ? <p className="status-text">Esta peluquería todavía no cargó sus peluqueros.</p> : null}
+
       <div className="peluquero-picker-list">
-        {PELUQUEROS.map((peluquero) => (
-          <button key={peluquero} type="button" className="peluquero-card" onClick={() => onSelect(peluquero)}>
-            <span className="peluquero-card-avatar">{peluquero.charAt(0)}</span>
-            <span className="peluquero-card-nombre">{peluquero}</span>
+        {barbers.map((barber) => (
+          <button key={barber.id} type="button" className="peluquero-card" onClick={() => onSelect(barber)}>
+            <span className="peluquero-card-avatar">{barber.name.charAt(0)}</span>
+            <span className="peluquero-card-nombre">{barber.name}</span>
             <span className="peluquero-card-arrow">→</span>
           </button>
         ))}
