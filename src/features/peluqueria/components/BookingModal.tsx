@@ -22,7 +22,7 @@ export function BookingModal({ dateLabel, time, isSubmitting, errorMessage, onCa
   return (
     <div className="modal-backdrop" role="presentation">
       <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
-        <h2 id="booking-modal-title">Reservá tu turno 🔥</h2>
+        <h2 id="booking-modal-title">Reservá tu turno</h2>
         <p className="modal-slot-summary">
           {dateLabel} a las <strong>{time}</strong>
         </p>
@@ -58,7 +58,7 @@ export function BookingModal({ dateLabel, time, isSubmitting, errorMessage, onCa
               Cancelar
             </button>
             <button type="submit" className="primary-button" disabled={isSubmitting || !clientName.trim() || !clientPhone.trim()}>
-              {isSubmitting ? "Reservando…" : "Confirmar ✨"}
+              {isSubmitting ? "Reservando…" : "Confirmar"}
             </button>
           </div>
         </form>

@@ -122,7 +122,7 @@ export function PeluqueriaHomePage() {
       </div>
 
       {isLoading ? (
-        <p className="status-text">Cargando horarios… ⏳</p>
+        <p className="status-text">Cargando horarios…</p>
       ) : loadError ? (
         <p className="status-text status-error">{loadError}</p>
       ) : (
