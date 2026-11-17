@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PushAlertsCard } from "./components/PushAlertsCard";
 import { fetchReservations } from "./peluqueria.client";
 import type { PeluqueriaReservation } from "./peluqueria.types";
 
@@ -26,6 +27,8 @@ export function PeluqueriaAdminPage() {
         <h1>Reservas</h1>
         <p>Listado de turnos reservados.</p>
       </header>
+
+      <PushAlertsCard />
 
       {errorMessage ? <p className="status-text status-error">{errorMessage}</p> : null}
       {!reservations && !errorMessage ? <p className="status-text">Cargando...</p> : null}

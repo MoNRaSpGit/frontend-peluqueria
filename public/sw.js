@@ -50,3 +50,40 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+// Avisos push (17/11/2026): el backend manda { title, body, url } cuando
+// alguien reserva un turno. Se muestra la notificacion y, al tocarla, se
+// abre (o se enfoca) el panel de reservas.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = {};
+  }
+  const title = data.title || "Nueva reserva";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || "",
+      icon: "icon-192.png",
+      badge: "icon-192.png",
+      data: { url: data.url || "#admin" }
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || "#admin", self.registration.scope).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      for (const client of windows) {
+        if (client.url.startsWith(self.registration.scope) && "focus" in client) {
+          if ("navigate" in client) client.navigate(target);
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(target);
+    })
+  );
+});
