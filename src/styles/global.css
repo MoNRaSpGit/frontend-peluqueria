@@ -1,18 +1,18 @@
-/* UX juvenil, punto medio (17/11/2026): fondo claro como el clasico, pero con
-   letra redonda, esquinas redondeadas y acentos violeta/rosa suaves. */
+/* UX juvenil (16/11/2026): oscuro, degrade violeta -> rosa, esquinas bien
+   redondas y botones grandes. Pensado para gente de ~20 años desde el celu. */
 :root {
-  --color-bg: #f7f5fc;
-  --color-surface: #ffffff;
-  --color-surface-2: #f0edf9;
-  --color-border: rgba(45, 30, 90, 0.13);
-  --color-text: #1f1b33;
-  --color-muted: #6d6889;
-  --color-accent: #7c5cf0;
-  --color-pink: #ee5a91;
-  --color-lime: #4f8a1f;
-  --color-danger: #cf3f5f;
-  --color-busy: rgba(45, 30, 90, 0.06);
-  --gradient: linear-gradient(135deg, #7c5cf0 0%, #ee5a91 100%);
+  --color-bg: #0c0b16;
+  --color-surface: #171629;
+  --color-surface-2: #201f38;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-text: #f5f3ff;
+  --color-muted: #9b98b8;
+  --color-accent: #8b5cf6;
+  --color-pink: #ff3d9a;
+  --color-lime: #b6ff3b;
+  --color-danger: #ff6b8a;
+  --color-busy: rgba(255, 255, 255, 0.04);
+  --gradient: linear-gradient(135deg, #8b5cf6 0%, #ff3d9a 100%);
   font-family: "Outfit", "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
@@ -25,8 +25,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(520px 320px at 90% -5%, rgba(124, 92, 240, 0.14), transparent 70%),
-    radial-gradient(460px 300px at -10% 15%, rgba(238, 90, 145, 0.10), transparent 70%),
+    radial-gradient(520px 320px at 85% -5%, rgba(139, 92, 246, 0.35), transparent 70%),
+    radial-gradient(460px 300px at -10% 20%, rgba(255, 61, 154, 0.22), transparent 70%),
     var(--color-bg);
   background-attachment: fixed;
   color: var(--color-text);
@@ -74,17 +74,17 @@ button {
   margin-bottom: 14px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(124, 92, 240, 0.10);
-  border: 1px solid rgba(124, 92, 240, 0.3);
-  color: #5a3fd0;
+  background: rgba(139, 92, 246, 0.16);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #d9ccff;
   font-size: 13px;
   font-weight: 600;
 }
 
 .confirmed-banner {
-  background: rgba(60, 160, 90, 0.12);
-  border: 1px solid rgba(60, 160, 90, 0.35);
-  color: #1f6b3a;
+  background: linear-gradient(135deg, rgba(182, 255, 59, 0.16), rgba(139, 92, 246, 0.16));
+  border: 1px solid rgba(182, 255, 59, 0.45);
+  color: #eaffc2;
   border-radius: 18px;
   padding: 14px 16px;
   margin-bottom: 20px;
@@ -114,7 +114,7 @@ button {
   align-items: center;
   gap: 16px;
   padding: 16px 18px;
-  border-radius: 22px;
+  border-radius: 18px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
@@ -126,8 +126,8 @@ button {
 .peluquero-card:hover,
 .peluquero-card:active {
   transform: translateY(-1px);
-  border-color: rgba(124, 92, 240, 0.55);
-  box-shadow: 0 8px 22px rgba(124, 92, 240, 0.16);
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.18);
 }
 
 .peluquero-card-avatar {
@@ -135,29 +135,20 @@ button {
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: var(--gradient);
-  color: #fff;
-  font-weight: 800;
-  font-size: 24px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: none;
-}
-
-.peluquero-card:nth-child(2) .peluquero-card-avatar {
-  background: linear-gradient(135deg, #38bdf8, #7c5cf0);
-}
-
-.peluquero-card:nth-child(3) .peluquero-card-avatar {
-  background: linear-gradient(135deg, #34d399, #38bdf8);
-  color: #fff;
 }
 
 .peluquero-card-nombre {
   flex: 1;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .peluquero-card-arrow {
@@ -211,8 +202,8 @@ button {
   background: var(--gradient);
   border-color: transparent;
   color: #fff;
-  transform: scale(1.04);
-  box-shadow: 0 6px 16px rgba(124, 92, 240, 0.3);
+  transform: scale(1.06);
+  box-shadow: 0 8px 22px rgba(255, 61, 154, 0.4);
 }
 
 .day-chip-weekday,
@@ -259,7 +250,7 @@ button {
   position: relative;
   padding: 16px 6px;
   border-radius: 18px;
-  border: 1px solid rgba(124, 92, 240, 0.4);
+  border: 1px solid rgba(139, 92, 246, 0.45);
   background: var(--color-surface);
   color: var(--color-text);
   font-size: 17px;
@@ -270,17 +261,16 @@ button {
 
 .slot-button:hover:not(:disabled),
 .slot-button:active:not(:disabled) {
-  background: var(--color-accent);
+  background: var(--gradient);
   border-color: transparent;
-  color: #fff;
-  transform: scale(1.03);
-  box-shadow: 0 6px 16px rgba(124, 92, 240, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
 }
 
 .slot-button-disabled {
   background: var(--color-busy);
   border-color: var(--color-border);
-  color: #a9a5c0;
+  color: #5d5a78;
   cursor: not-allowed;
   text-decoration: line-through;
 }
@@ -297,8 +287,8 @@ button {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(30, 22, 60, 0.45);
-  backdrop-filter: blur(4px);
+  background: rgba(5, 4, 12, 0.7);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -318,9 +308,9 @@ button {
   max-width: 440px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 24px 24px 0 0;
+  border-radius: 28px 28px 0 0;
   padding: 26px 22px 30px;
-  box-shadow: 0 -8px 40px rgba(45, 30, 90, 0.2);
+  box-shadow: 0 -10px 50px rgba(139, 92, 246, 0.3);
   animation: slide-up 0.25s ease;
 }
 
@@ -337,7 +327,7 @@ button {
 
 @media (min-width: 540px) {
   .modal-card {
-    border-radius: 24px;
+    border-radius: 28px;
   }
 }
 
@@ -382,11 +372,11 @@ button {
 
 .modal-field input:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(124, 92, 240, 0.2);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
 }
 
 .modal-field input::placeholder {
-  color: #a39fbd;
+  color: #66638a;
 }
 
 .modal-error {
@@ -422,7 +412,7 @@ button {
 .primary-button {
   background: var(--gradient);
   color: #fff;
-  box-shadow: 0 6px 18px rgba(124, 92, 240, 0.3);
+  box-shadow: 0 8px 24px rgba(255, 61, 154, 0.35);
 }
 
 .primary-button:disabled {
