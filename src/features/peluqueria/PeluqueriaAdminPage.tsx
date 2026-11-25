@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SalonHeader } from "./components/SalonHeader";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { ShareLinkCard } from "./components/ShareLinkCard";
+import { UserMenu } from "./components/UserMenu";
 import { fetchAdminReservations, PeluqueriaUnauthorizedError } from "./peluqueria.client";
 import { readLastSeen, saveLastSeen, type OwnerSession } from "./peluqueria.session";
 import type { PeluqueriaReservation, PeluqueriaSalon } from "./peluqueria.types";
@@ -50,12 +51,12 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
 
   return (
     <>
-      <SalonHeader salon={salon} />
+      <SalonHeader salon={salon} menu={<UserMenu username={session.user.username} onConfig={() => setTab("config")} onLogout={onLogout} />} />
       <div className="peluqueria-page">
         <header className="peluqueria-header admin-header">
           <div>
-            <h1>Reservas</h1>
-            <p>Tu agenda de turnos.</p>
+            <h1>{tab === "config" ? "Configuración" : tab === "link" ? "Link para clientes" : "Reservas"}</h1>
+            <p>{tab === "config" ? "Tus peluqueros y tu horario." : tab === "link" ? "Lo que le mandás a tus clientes." : "Tu agenda de turnos."}</p>
           </div>
           <div className="admin-header-actions">
             <div className="bell" aria-label={`${fresh.length} reservas nuevas`}>
@@ -64,9 +65,6 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
               </span>
               {fresh.length > 0 ? <span className="bell-badge">{fresh.length > 99 ? "99+" : fresh.length}</span> : null}
             </div>
-            <button type="button" className="logout-button" onClick={onLogout}>
-              Salir
-            </button>
           </div>
         </header>
 
@@ -76,9 +74,6 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
           </button>
           <button type="button" className={tab === "link" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("link")}>
             Link
-          </button>
-          <button type="button" className={tab === "config" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("config")}>
-            Configuración
           </button>
         </nav>
 

@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { PeluqueriaApp } from "./features/peluqueria/PeluqueriaApp";
+import { AppFooter } from "./shared/components/AppFooter";
+import { AppUpdateNotice } from "./shared/components/AppUpdateNotice";
 import "./styles/global.css";
 
 // PWA (02/10/2026): solo en produccion -- en dev el service worker viejo
@@ -15,5 +17,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <PeluqueriaApp />
+    <AppFooter />
+    <AppUpdateNotice />
   </StrictMode>
 );
