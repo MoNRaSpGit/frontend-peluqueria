@@ -6,7 +6,7 @@ import type { PeluqueriaSalon } from "./peluqueria.types";
 
 // Entrada al panel del dueño. El usuario y la contraseña los crea Logic Lab al
 // dar de alta la peluqueria; cada usuario ve solo las reservas de su local.
-export function PeluqueriaLoginPage({ salon, onLoggedIn }: { salon: PeluqueriaSalon; onLoggedIn: (session: OwnerSession) => void }) {
+export function PeluqueriaLoginPage({ salon, onLoggedIn }: { salon: Pick<PeluqueriaSalon, "name" | "logoUrl">; onLoggedIn: (session: OwnerSession) => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

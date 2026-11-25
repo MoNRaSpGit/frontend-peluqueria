@@ -10,17 +10,18 @@ import type { PeluqueriaSalon } from "./peluqueria.types";
 // Ruteo por hash (GitHub Pages no sirve rutas de verdad):
 //   #/<local>          -> la clienta reserva su turno en ese local
 //   #/<local>/admin    -> panel del dueño de ese local (con login)
-// Sin hash se abre el local de demostracion, asi el link de siempre sigue
-// funcionando. "#admin" (el link viejo) tambien cae en el demo.
-const DEFAULT_SLUG = "demo";
+//   (sin hash) o #admin -> entrada del DUEÑO: login, y si ya tiene sesion
+//                           pasa directo al panel de su local (25/11/2026)
+// La demo para mostrar a prospectos vive ahora en #/demo.
+type Route = { slug: string | null; admin: boolean };
 
-type Route = { slug: string; admin: boolean };
+const LOGIN_HEADER = { name: "Reservas", logoUrl: null };
 
 function readRoute(): Route {
   const hash = window.location.hash.replace(/^#\/?/, "");
-  if (hash === "admin") return { slug: DEFAULT_SLUG, admin: true };
+  if (hash === "" || hash === "admin") return { slug: null, admin: true };
   const [slug, section] = hash.split("/");
-  return { slug: slug?.trim().toLowerCase() || DEFAULT_SLUG, admin: section === "admin" };
+  return { slug: slug?.trim().toLowerCase() || null, admin: section === "admin" };
 }
 
 type SalonState = { status: "loading" } | { status: "notFound" } | { status: "error" } | { status: "ready"; salon: PeluqueriaSalon };
@@ -40,6 +41,7 @@ export function PeluqueriaApp() {
 
   useEffect(() => {
     let cancelled = false;
+    if (!route.slug) return;
     setSalonState({ status: "loading" });
     fetchSalon(route.slug)
       .then((salon) => {
@@ -56,14 +58,23 @@ export function PeluqueriaApp() {
   function handleLoggedIn(next: OwnerSession) {
     saveOwnerSession(next);
     setSession(next);
-    // Si el usuario es de OTRA peluqueria, se lo manda a la suya.
-    if (next.user.salonSlug !== route.slug) window.location.hash = `#/${next.user.salonSlug}/admin`;
+    // Siempre se lo manda al panel de SU peluqueria.
+    window.location.hash = `#/${next.user.salonSlug}/admin`;
   }
 
   function handleLogout() {
     if (session) void logoutOwner(session.token);
     clearOwnerSession();
     setSession(null);
+  }
+
+  // Entrada del dueño sin local en la direccion: login, o directo a su panel.
+  if (route.slug === null) {
+    if (session) {
+      window.location.replace(`#/${session.user.salonSlug}/admin`);
+      return null;
+    }
+    return <PeluqueriaLoginPage salon={LOGIN_HEADER} onLoggedIn={handleLoggedIn} />;
   }
 
   if (salonState.status === "loading") {

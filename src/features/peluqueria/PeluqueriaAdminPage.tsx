@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SalonHeader } from "./components/SalonHeader";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { ShareLinkCard } from "./components/ShareLinkCard";
 import { fetchAdminReservations, PeluqueriaUnauthorizedError } from "./peluqueria.client";
 import { readLastSeen, saveLastSeen, type OwnerSession } from "./peluqueria.session";
 import type { PeluqueriaReservation, PeluqueriaSalon } from "./peluqueria.types";
@@ -77,6 +78,8 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
             Configuración
           </button>
         </nav>
+
+        <ShareLinkCard slug={salon.slug} salonName={salon.name} />
 
         {tab === "config" ? <SettingsPanel token={session.token} onUnauthorized={onLogout} /> : null}
 
