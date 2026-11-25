@@ -716,3 +716,8 @@ button {
 .share-link { display: block; padding: 10px 12px; border-radius: 10px; background: var(--color-surface-2); font-size: 13px; word-break: break-all; user-select: all; }
 .share-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .share-wa { display: inline-flex; align-items: center; text-decoration: none; }
+
+/* Login: ver/ocultar contraseña */
+.password-row { display: flex; gap: 8px; align-items: center; }
+.password-row input { flex: 1; min-width: 0; }
+.password-toggle { height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text); font-size: 13px; font-weight: 700; cursor: pointer; }
