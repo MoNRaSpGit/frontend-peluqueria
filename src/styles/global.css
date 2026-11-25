@@ -788,3 +788,14 @@ button {
   .slot-button:hover:not(:disabled) { background: var(--color-surface); border-color: rgba(139, 92, 246, 0.45); transform: none; box-shadow: none; }
   .slot-button:active:not(:disabled) { background: var(--gradient); border-color: transparent; }
 }
+
+/* Cabecera con mas presencia + bienvenida (25/11/2026) */
+.salon-header { padding: 14px 18px; background: linear-gradient(180deg, rgba(36, 30, 66, 0.85), rgba(23, 22, 41, 0.55)); }
+.salon-logo { width: 52px; height: 52px; border-radius: 16px; }
+.salon-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+.welcome-hero { position: relative; margin: 4px 0 18px; padding: 20px 18px; border-radius: 22px; border: 1px solid rgba(139, 92, 246, 0.35); background: radial-gradient(420px 200px at 100% 0%, rgba(255, 61, 154, 0.22), transparent 70%), radial-gradient(380px 220px at 0% 100%, rgba(139, 92, 246, 0.3), transparent 70%), var(--color-surface); overflow: hidden; }
+.welcome-text { display: grid; gap: 6px; min-width: 0; }
+.welcome-hello { font-size: 14px; font-weight: 700; color: var(--color-muted); }
+.welcome-hero h1 { margin: 0; font-size: 26px; line-height: 1.15; }
+.welcome-hero p { margin: 2px 0 0; color: var(--color-text); opacity: 0.85; font-size: 15px; }
+.welcome-hero .bell { align-self: flex-start; }

@@ -65,15 +65,31 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
   const fresh = (visibleReservations ?? []).filter((reservation) => reservation.id > lastSeenId);
   const freshIds = new Set(fresh.map((reservation) => reservation.id));
 
+  const ownerName = session.user.username.charAt(0).toUpperCase() + session.user.username.slice(1);
+  const nowDate = new Date();
+  const todayKey = `${nowDate.getFullYear()}-${String(nowDate.getMonth() + 1).padStart(2, "0")}-${String(nowDate.getDate()).padStart(2, "0")}`;
+  const todayCount = (reservations ?? []).filter((reservation) => reservation.date === todayKey).length;
+  const todaySummary = !reservations ? "Cargando tu agenda…" : todayCount === 0 ? "Hoy no tenés turnos. ¡Buen momento para mandar tu link!" : todayCount === 1 ? "Hoy tenés 1 turno." : `Hoy tenés ${todayCount} turnos.`;
+
   return (
     <>
       <SalonHeader salon={salon} menu={<UserMenu username={session.user.username} onConfig={() => setTab("config")} onLogout={onLogout} />} />
       <div className="peluqueria-page">
-        <header className="peluqueria-header admin-header">
-          <div>
-            <h1>{tab === "config" ? "Configuración" : tab === "link" ? "Link para clientes" : "Reservas"}</h1>
-            <p>{tab === "config" ? "Tus peluqueros y tu horario." : tab === "link" ? "Lo que le mandás a tus clientes." : "Tu agenda de turnos."}</p>
-          </div>
+        <header className={tab === "reservas" ? "peluqueria-header admin-header welcome-hero" : "peluqueria-header admin-header"}>
+          {tab === "reservas" ? (
+            <div className="welcome-text">
+              <span className="welcome-hello">¡Hola, {ownerName}! 👋</span>
+              <h1>
+                Bienvenido a <span className="grad">{salon.name}</span>
+              </h1>
+              <p>{todaySummary}</p>
+            </div>
+          ) : (
+            <div>
+              <h1>{tab === "config" ? "Configuración" : "Link para clientes"}</h1>
+              <p>{tab === "config" ? "Tus peluqueros y tu horario." : "Lo que le mandás a tus clientes."}</p>
+            </div>
+          )}
           <div className="admin-header-actions">
             <div className="bell" aria-label={`${fresh.length} reservas nuevas`}>
               <span className="bell-icon" aria-hidden="true">
