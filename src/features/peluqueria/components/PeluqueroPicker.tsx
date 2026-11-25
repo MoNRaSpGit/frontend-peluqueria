@@ -14,10 +14,10 @@ export function PeluqueroPicker({ barbers, onSelect }: PeluqueroPickerProps) {
         <h1>
           ¿Con quién <span className="grad">te cortás</span> hoy?
         </h1>
-        <p>Elegí tu peluquero y mirá los horarios libres.</p>
+        <p>Elegí con quién querés tu turno y mirá los horarios libres.</p>
       </header>
 
-      {barbers.length === 0 ? <p className="status-text">Esta peluquería todavía no cargó sus peluqueros.</p> : null}
+      {barbers.length === 0 ? <p className="status-text">Este local todavía no cargó a su equipo.</p> : null}
 
       <div className="peluquero-picker-list">
         {barbers.map((barber) => (

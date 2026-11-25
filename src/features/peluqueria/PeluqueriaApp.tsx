@@ -77,7 +77,7 @@ export function PeluqueriaApp() {
     return (
       <div className="peluqueria-page">
         <header className="peluqueria-header">
-          <h1>{salonState.status === "notFound" ? "No encontramos esa peluquería" : "No se pudo cargar"}</h1>
+          <h1>{salonState.status === "notFound" ? "No encontramos ese link" : "No se pudo cargar"}</h1>
           <p>
             {salonState.status === "notFound"
               ? "Revisá que el link esté bien escrito."

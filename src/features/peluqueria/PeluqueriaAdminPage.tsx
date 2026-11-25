@@ -128,7 +128,7 @@ function ReservationTable({
     <table className="admin-table">
       <thead>
         <tr>
-          <th>Peluquero</th>
+          <th>Profesional</th>
           <th>Fecha</th>
           <th>Hora</th>
           <th>Cliente</th>

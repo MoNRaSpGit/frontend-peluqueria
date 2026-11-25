@@ -30,7 +30,7 @@ function authHeaders(token: string): HeadersInit {
 export async function fetchSalon(slug: string): Promise<PeluqueriaSalon> {
   const response = await fetch(buildUrl(`/salons/${encodeURIComponent(slug)}`));
   if (response.status === 404) throw new PeluqueriaSalonNotFoundError("Peluquería no encontrada");
-  if (!response.ok) throw new Error("No se pudo cargar la peluquería.");
+  if (!response.ok) throw new Error("No se pudo cargar el local.");
   return readJson<PeluqueriaSalon>(response);
 }
 
