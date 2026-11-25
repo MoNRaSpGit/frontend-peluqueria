@@ -14,6 +14,25 @@ import type { PeluqueriaReservation, PeluqueriaSalon } from "./peluqueria.types"
 // como vistas. No depende de permisos del navegador.
 const REFRESH_MS = 15_000;
 
+// MODO DEMO TEMPORAL (25/11/2026, pedido explicito): el panel muestra SOLO la
+// proxima reserva de cada peluquero, aunque haya mas, para no llenar la
+// pantalla de tarjetas mientras se muestra. NO toca la base ni la pantalla de
+// reservar (ahi los horarios ocupados siguen todos tachados). Para volver a
+// mostrar todo: poner DEMO_ONE_PER_BARBER en false (o borrar este bloque).
+const DEMO_ONE_PER_BARBER = true;
+
+function keepNextPerBarber(items: PeluqueriaReservation[]): PeluqueriaReservation[] {
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const next = new Map<string, PeluqueriaReservation>();
+  for (const item of items) {
+    if (item.date < todayKey) continue;
+    const current = next.get(item.peluquero);
+    if (!current || `${item.date} ${item.time}` < `${current.date} ${current.time}`) next.set(item.peluquero, item);
+  }
+  return [...next.values()];
+}
+
 export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: PeluqueriaSalon; session: OwnerSession; onLogout: () => void }) {
   const [reservations, setReservations] = useState<PeluqueriaReservation[] | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -42,7 +61,8 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
     return () => window.clearInterval(interval);
   }, [load]);
 
-  const fresh = (reservations ?? []).filter((reservation) => reservation.id > lastSeenId);
+  const visibleReservations = reservations && DEMO_ONE_PER_BARBER ? keepNextPerBarber(reservations) : reservations;
+  const fresh = (visibleReservations ?? []).filter((reservation) => reservation.id > lastSeenId);
   const freshIds = new Set(fresh.map((reservation) => reservation.id));
 
   return (
@@ -89,7 +109,7 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
         {tab === "reservas" && !reservations && !errorMessage ? <p className="status-text">Cargando...</p> : null}
 
         {tab === "reservas" && reservations ? (
-          <ReservationsView reservations={reservations} freshIds={freshIds} salonName={salon.name} onGoToLink={() => setTab("link")} />
+          <ReservationsView reservations={visibleReservations ?? reservations} freshIds={freshIds} salonName={salon.name} onGoToLink={() => setTab("link")} />
         ) : null}
       </div>
     </>
