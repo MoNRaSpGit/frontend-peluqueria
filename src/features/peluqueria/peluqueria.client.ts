@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../../shared/config/api";
-import type { PeluqueriaBusySlot, PeluqueriaOwner, PeluqueriaReservation, PeluqueriaSalon } from "./peluqueria.types";
+import type { PeluqueriaAdminSettings, PeluqueriaBusySlot, PeluqueriaOwner, PeluqueriaReservation, PeluqueriaSalon, PeluqueriaSchedule } from "./peluqueria.types";
 
 export class PeluqueriaSlotTakenError extends Error {}
 export class PeluqueriaSalonNotFoundError extends Error {}
@@ -79,4 +79,31 @@ export async function fetchAdminReservations(token: string): Promise<PeluqueriaR
   if (response.status === 401) throw new PeluqueriaUnauthorizedError("Sesión vencida");
   if (!response.ok) throw new Error("No se pudieron cargar las reservas.");
   return readJson<PeluqueriaReservation[]>(response);
+}
+
+async function adminRequest(token: string, path: string, method: string, body?: unknown, fallback = "No se pudo guardar."): Promise<PeluqueriaAdminSettings> {
+  const response = await fetch(buildUrl(path), {
+    method,
+    headers: { ...authHeaders(token), ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  if (response.status === 401) throw new PeluqueriaUnauthorizedError("Sesión vencida");
+  if (!response.ok) throw new Error(await readMessage(response, fallback));
+  return readJson<PeluqueriaAdminSettings>(response);
+}
+
+export function fetchAdminSettings(token: string) {
+  return adminRequest(token, "/admin/settings", "GET", undefined, "No se pudo cargar la configuración.");
+}
+
+export function saveSchedule(token: string, schedule: PeluqueriaSchedule) {
+  return adminRequest(token, "/admin/schedule", "PUT", schedule, "No se pudo guardar el horario.");
+}
+
+export function addBarber(token: string, name: string) {
+  return adminRequest(token, "/admin/barbers", "POST", { name: name.trim() }, "No se pudo agregar el peluquero.");
+}
+
+export function updateBarber(token: string, id: number, changes: { name?: string; active?: boolean }) {
+  return adminRequest(token, `/admin/barbers/${id}`, "PATCH", changes, "No se pudo guardar el cambio.");
 }

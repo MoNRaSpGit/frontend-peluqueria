@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { SalonHeader } from "./components/SalonHeader";
+import { SettingsPanel } from "./components/SettingsPanel";
 import { fetchAdminReservations, PeluqueriaUnauthorizedError } from "./peluqueria.client";
 import { readLastSeen, saveLastSeen, type OwnerSession } from "./peluqueria.session";
 import type { PeluqueriaReservation, PeluqueriaSalon } from "./peluqueria.types";
@@ -13,6 +14,7 @@ const REFRESH_MS = 15_000;
 export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: PeluqueriaSalon; session: OwnerSession; onLogout: () => void }) {
   const [reservations, setReservations] = useState<PeluqueriaReservation[] | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [tab, setTab] = useState<"reservas" | "config">("reservas");
   // "Nuevo" se calcula contra lo ultimo visto ANTES de esta visita: durante la
   // visita sigue resaltado y la proxima vez que entre ya no aparece.
   const [lastSeenId] = useState(() => readLastSeen(salon.slug));
@@ -67,7 +69,18 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
           </div>
         </header>
 
-        {fresh.length > 0 ? (
+        <nav className="admin-tabs" aria-label="Secciones">
+          <button type="button" className={tab === "reservas" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("reservas")}>
+            Reservas
+          </button>
+          <button type="button" className={tab === "config" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("config")}>
+            Configuración
+          </button>
+        </nav>
+
+        {tab === "config" ? <SettingsPanel token={session.token} onUnauthorized={onLogout} /> : null}
+
+        {tab === "reservas" && fresh.length > 0 ? (
           <section className="fresh-card">
             <div className="fresh-card-head">
               <strong>{fresh.length === 1 ? "1 reserva nueva" : `${fresh.length} reservas nuevas`}</strong>
@@ -86,14 +99,14 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
               ))}
             </ul>
           </section>
-        ) : reservations ? (
+        ) : tab === "reservas" && reservations ? (
           <p className="status-text fresh-empty">✔ Estás al día, no hay reservas nuevas.</p>
         ) : null}
 
-        {errorMessage ? <p className="status-text status-error">{errorMessage}</p> : null}
-        {!reservations && !errorMessage ? <p className="status-text">Cargando...</p> : null}
+        {tab === "reservas" && errorMessage ? <p className="status-text status-error">{errorMessage}</p> : null}
+        {tab === "reservas" && !reservations && !errorMessage ? <p className="status-text">Cargando...</p> : null}
 
-        {reservations ? (
+        {tab === "reservas" && reservations ? (
           <>
             <h2 className="admin-section-title">Próximos ({upcoming.length})</h2>
             <ReservationTable reservations={upcoming} emptyText="No hay turnos reservados." freshIds={freshIds} />

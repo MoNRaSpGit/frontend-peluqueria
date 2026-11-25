@@ -40,3 +40,8 @@ export type PeluqueriaOwner = {
   salonSlug: string;
   salonName: string;
 };
+
+export type PeluqueriaAdminSettings = {
+  schedule: PeluqueriaSchedule;
+  barbers: Array<{ id: number; name: string; active: boolean }>;
+};
