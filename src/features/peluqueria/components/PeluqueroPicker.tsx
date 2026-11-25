@@ -12,7 +12,7 @@ export function PeluqueroPicker({ barbers, onSelect }: PeluqueroPickerProps) {
     <div className="peluqueria-page">
       <header className="peluqueria-header">
         <h1>
-          ¿Con quién <span className="grad">te cortás</span> hoy?
+          ¿Con quién querés <span className="grad">tu turno</span>?
         </h1>
         <p>Elegí con quién querés tu turno y mirá los horarios libres.</p>
       </header>
