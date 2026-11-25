@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SalonHeader } from "./components/SalonHeader";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { ReservationsView } from "./components/ReservationsView";
 import { ShareLinkCard } from "./components/ShareLinkCard";
 import { UserMenu } from "./components/UserMenu";
 import { fetchAdminReservations, PeluqueriaUnauthorizedError } from "./peluqueria.client";
@@ -44,11 +45,6 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
   const fresh = (reservations ?? []).filter((reservation) => reservation.id > lastSeenId);
   const freshIds = new Set(fresh.map((reservation) => reservation.id));
 
-  const today = new Date();
-  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const upcoming = reservations?.filter((reservation) => reservation.date >= todayKey) ?? [];
-  const past = reservations?.filter((reservation) => reservation.date < todayKey) ?? [];
-
   return (
     <>
       <SalonHeader salon={salon} menu={<UserMenu username={session.user.username} onConfig={() => setTab("config")} onLogout={onLogout} />} />
@@ -82,24 +78,9 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
         {tab === "config" ? <SettingsPanel token={session.token} onUnauthorized={onLogout} /> : null}
 
         {tab === "reservas" && fresh.length > 0 ? (
-          <section className="fresh-card">
-            <div className="fresh-card-head">
-              <strong>{fresh.length === 1 ? "1 reserva nueva" : `${fresh.length} reservas nuevas`}</strong>
-            </div>
-            <ul className="fresh-list">
-              {fresh.map((reservation) => (
-                <li key={reservation.id}>
-                  <span className="fresh-time">
-                    {reservation.date.slice(8, 10)}/{reservation.date.slice(5, 7)} · {reservation.time}
-                  </span>
-                  <span>
-                    <strong>{reservation.clientName}</strong> con {reservation.peluquero}
-                  </span>
-                  <span className="fresh-phone">{reservation.clientPhone}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <p className="fresh-banner">
+            🔔 <strong>{fresh.length === 1 ? "1 reserva nueva" : `${fresh.length} reservas nuevas`}</strong> desde tu última visita
+          </p>
         ) : tab === "reservas" && reservations ? (
           <p className="status-text fresh-empty">✔ Estás al día, no hay reservas nuevas.</p>
         ) : null}
@@ -108,62 +89,9 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
         {tab === "reservas" && !reservations && !errorMessage ? <p className="status-text">Cargando...</p> : null}
 
         {tab === "reservas" && reservations ? (
-          <>
-            <h2 className="admin-section-title">Próximos ({upcoming.length})</h2>
-            <ReservationTable reservations={upcoming} emptyText="No hay turnos reservados." freshIds={freshIds} />
-
-            {past.length > 0 ? (
-              <>
-                <h2 className="admin-section-title">Pasados ({past.length})</h2>
-                <ReservationTable reservations={past} emptyText="" freshIds={freshIds} />
-              </>
-            ) : null}
-          </>
+          <ReservationsView reservations={reservations} freshIds={freshIds} salonName={salon.name} onGoToLink={() => setTab("link")} />
         ) : null}
       </div>
     </>
-  );
-}
-
-function ReservationTable({
-  reservations,
-  emptyText,
-  freshIds
-}: {
-  reservations: PeluqueriaReservation[];
-  emptyText: string;
-  freshIds: Set<number>;
-}) {
-  if (reservations.length === 0) {
-    return <p className="status-text">{emptyText}</p>;
-  }
-
-  return (
-    <table className="admin-table">
-      <thead>
-        <tr>
-          <th>Profesional</th>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Cliente</th>
-          <th>Celular</th>
-        </tr>
-      </thead>
-      <tbody>
-        {reservations.map((reservation) => (
-          <tr key={reservation.id} className={freshIds.has(reservation.id) ? "row-fresh" : undefined}>
-            <td>{reservation.peluquero}</td>
-            <td>{reservation.date}</td>
-            <td>{reservation.time}</td>
-            <td>
-              {reservation.clientName}
-              {reservation.clientVisits > 1 ? <span className="visits-pill">{reservation.clientVisits}ª visita</span> : null}
-              {freshIds.has(reservation.id) ? <span className="new-pill">NUEVA</span> : null}
-            </td>
-            <td>{reservation.clientPhone}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
   );
 }

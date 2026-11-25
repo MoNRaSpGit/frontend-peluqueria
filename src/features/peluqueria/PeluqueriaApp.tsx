@@ -55,6 +55,12 @@ export function PeluqueriaApp() {
     };
   }, [route.slug]);
 
+  // Titulo de la pestaña del navegador segun donde este.
+  useEffect(() => {
+    if (route.slug === null) document.title = "Reservas · Iniciar sesión";
+    else if (salonState.status === "ready") document.title = route.admin ? `${salonState.salon.name} · Reservas` : `Reservá tu turno · ${salonState.salon.name}`;
+  }, [route, salonState]);
+
   function handleLoggedIn(next: OwnerSession) {
     saveOwnerSession(next);
     setSession(next);
