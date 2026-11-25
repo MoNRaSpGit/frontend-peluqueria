@@ -776,3 +776,15 @@ button {
 .res-past .res-day { margin-bottom: 18px; }
 .res-empty { display: grid; gap: 10px; justify-items: start; margin-top: 18px; padding: 22px 18px; border-radius: 18px; border: 1px dashed var(--color-border); background: var(--color-surface); }
 .res-empty span { font-size: 14px; color: var(--color-muted); }
+
+/* Arreglos 25/11/2026: (1) el ultimo dia del selector se veia cortado porque
+   el padding derecho de un contenedor con scroll se ignora; se agrega un
+   espaciador. (2) En el celu, :hover queda "pegado" despues de tocar un
+   horario y esa misma posicion se veia marcada en los otros peluqueros/dias;
+   el resaltado de hover ahora solo existe en pantallas con mouse. */
+.day-picker::after { content: ""; flex: 0 0 18px; }
+.day-picker { scroll-padding-inline: 18px; }
+@media (hover: none) {
+  .slot-button:hover:not(:disabled) { background: var(--color-surface); border-color: rgba(139, 92, 246, 0.45); transform: none; box-shadow: none; }
+  .slot-button:active:not(:disabled) { background: var(--gradient); border-color: transparent; }
+}
