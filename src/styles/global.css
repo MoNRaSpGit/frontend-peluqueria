@@ -721,3 +721,10 @@ button {
 .password-row { display: flex; gap: 8px; align-items: center; }
 .password-row input { flex: 1; min-width: 0; }
 .password-toggle { height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text); font-size: 13px; font-weight: 700; cursor: pointer; }
+
+/* Pestana Link: mas grande y clara; tres pestañas parejas */
+.admin-tab { min-width: 0; padding: 11px 8px; font-size: 13px; }
+.share-card { padding: 20px 18px; gap: 12px; margin-top: 16px; }
+.share-card strong { font-size: 18px; }
+.share-link { padding: 14px; font-size: 14px; text-align: center; }
+.share-actions .settings-btn { flex: 1; justify-content: center; text-align: center; height: 48px; font-size: 14px; }

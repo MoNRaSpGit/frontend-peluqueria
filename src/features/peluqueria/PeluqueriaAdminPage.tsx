@@ -15,7 +15,7 @@ const REFRESH_MS = 15_000;
 export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: PeluqueriaSalon; session: OwnerSession; onLogout: () => void }) {
   const [reservations, setReservations] = useState<PeluqueriaReservation[] | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [tab, setTab] = useState<"reservas" | "config">("reservas");
+  const [tab, setTab] = useState<"reservas" | "link" | "config">("reservas");
   // "Nuevo" se calcula contra lo ultimo visto ANTES de esta visita: durante la
   // visita sigue resaltado y la proxima vez que entre ya no aparece.
   const [lastSeenId] = useState(() => readLastSeen(salon.slug));
@@ -74,12 +74,15 @@ export function PeluqueriaAdminPage({ salon, session, onLogout }: { salon: Peluq
           <button type="button" className={tab === "reservas" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("reservas")}>
             Reservas
           </button>
+          <button type="button" className={tab === "link" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("link")}>
+            Link
+          </button>
           <button type="button" className={tab === "config" ? "admin-tab admin-tab-active" : "admin-tab"} onClick={() => setTab("config")}>
             Configuración
           </button>
         </nav>
 
-        <ShareLinkCard slug={salon.slug} salonName={salon.name} />
+        {tab === "link" ? <ShareLinkCard slug={salon.slug} salonName={salon.name} /> : null}
 
         {tab === "config" ? <SettingsPanel token={session.token} onUnauthorized={onLogout} /> : null}
 
